@@ -6,20 +6,26 @@ import java.awt.Component;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Rectangle;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.util.ArrayList;
 import java.util.List;
 import javax.swing.JComponent;
 import javax.swing.JFrame;
 import net.miginfocom.swing.MigLayout;
 import org.jdesktop.animation.timing.Animator;
-import org.jdesktop.animation.timing.interpolation.PropertySetter;
+import org.jdesktop.animation.timing.TimingTargetAdapter;
 
-public class Drawer {
+public class Drawer implements DrawerController {
 
     public static Drawer newDrawer(JFrame fram) {
         return new Drawer(fram);
     }
+
+    private DrawerPanel panelDrawer;
     private Animator animator;
+    private MouseListener mouseEvent;
     private final JFrame fram;
     private final List<Component> childrens;
     private Component header;
@@ -28,18 +34,46 @@ public class Drawer {
     private Color background = new Color(30, 30, 30);
     private Color drawerBackground = Color.WHITE;
     private float backgroundTransparent = 0.5f;
+    private int duration = 500;
+    private int resolution = 10;
+    private boolean isShow;
+    private boolean closeOnPress = true;
 
     private Drawer(JFrame fram) {
         this.fram = fram;
         childrens = new ArrayList<>();
     }
 
-    private void initAnimator(int duration, int resolution, DrawerPanel drawer) {
-        animator = new Animator(duration);
+    private void createAnimator(int duration, int resolution) {
+        animator = new Animator(duration, new TimingTargetAdapter() {
+            @Override
+            public void timingEvent(float fraction) {
+                if (isShow) {
+                    panelDrawer.setAnimate(fraction);
+                } else {
+                    panelDrawer.setAnimate(1f - fraction);
+                }
+            }
+
+            @Override
+            public void end() {
+                if (panelDrawer.getAnimate() == 0) {
+                    fram.getGlassPane().setVisible(false);
+                }
+            }
+
+        });
         animator.setAcceleration(.5f);
         animator.setDeceleration(.5f);
         animator.setResolution(resolution);
-        animator.addTarget(new PropertySetter(drawer, "animate", drawer.getAnimate(), 1f));
+        if (closeOnPress) {
+            mouseEvent = new MouseAdapter() {
+                @Override
+                public void mousePressed(MouseEvent e) {
+                    hide();
+                }
+            };
+        }
     }
 
     public Drawer header(Component component) {
@@ -77,22 +111,76 @@ public class Drawer {
         return this;
     }
 
-    public void build() {
-        DrawerPanel panel = new DrawerPanel(drawerWidth, backgroundTransparent);
-        panel.setBackground(background);
-        panel.setDrawerBackground(drawerBackground);
-        if (header != null) {
-            panel.addItem(header, "h " + headerHeight);
-        }
-        for (Component com : childrens) {
-            panel.addItem(com);
-        }
-        fram.setGlassPane(panel);
-        fram.getGlassPane().setVisible(true);
-        panel.setAnimate(1);
+    public Drawer duration(int duration) {
+        this.duration = duration;
+        return this;
     }
 
-    private class DrawerPanel extends JComponent {
+    public Drawer resolution(int resolution) {
+        this.resolution = resolution;
+        return this;
+    }
+
+    public Drawer closeOnPress(boolean closeOnPress) {
+        this.closeOnPress = closeOnPress;
+        return this;
+    }
+
+    @Override
+    public void show() {
+        if (!isShow) {
+            fram.getGlassPane().setVisible(true);
+            if (closeOnPress) {
+                panelDrawer.removeMouseListener(mouseEvent);
+                panelDrawer.addMouseListener(mouseEvent);
+            }
+            start(true);
+        }
+    }
+
+    @Override
+    public void hide() {
+        if (isShow) {
+            if (closeOnPress) {
+                panelDrawer.removeMouseListener(mouseEvent);
+            }
+            start(false);
+        }
+    }
+
+    @Override
+    public boolean isShow() {
+        return isShow;
+    }
+
+    private void start(boolean isShow) {
+        if (animator.isRunning()) {
+            animator.stop();
+            float f = animator.getTimingFraction();
+            animator.setStartFraction(1f - f);
+        } else {
+            animator.setStartFraction(0f);
+        }
+        this.isShow = isShow;
+        animator.start();
+    }
+
+    public DrawerController build() {
+        panelDrawer = new DrawerPanel(drawerWidth, backgroundTransparent);
+        panelDrawer.setBackground(background);
+        panelDrawer.setDrawerBackground(drawerBackground);
+        if (header != null) {
+            panelDrawer.addItem(header, "h " + headerHeight);
+        }
+        for (Component com : childrens) {
+            panelDrawer.addItem(com);
+        }
+        createAnimator(duration, resolution);
+        fram.setGlassPane(panelDrawer);
+        return this;
+    }
+
+    protected class DrawerPanel extends JComponent {
 
         public float getAnimate() {
             return animate;
@@ -147,6 +235,14 @@ public class Drawer {
     }
 
     private class DrawerItem extends JComponent {
+
+        public DrawerItem() {
+            addMouseListener(new MouseAdapter() {
+                @Override
+                public void mousePressed(MouseEvent e) {
+                }
+            });
+        }
 
         @Override
         protected void paintComponent(Graphics g) {

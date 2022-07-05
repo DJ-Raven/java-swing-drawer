@@ -1,21 +1,25 @@
 package test;
 
+import java.awt.Color;
 import javaswingdev.drawer.Drawer;
+import javaswingdev.drawer.DrawerController;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 
-/**
- *
- * @author raven
- */
 public class Test extends javax.swing.JFrame {
 
-    /**
-     * Creates new form Test
-     */
+    private DrawerController drawer;
+
     public Test() {
         initComponents();
-        Drawer.newDrawer(this).header(new JButton("Header")).drawerWidth(250).addChild(new JLabel("Item 1")).addChild(new JLabel("Item 2")).build();
+        drawer = Drawer.newDrawer(this)
+                .background(new Color(90, 90, 90))
+                .closeOnPress(false)
+                .drawerWidth(250)
+                .header(new JButton("Header"))
+                .addChild(new JLabel("Item 1"))
+                .addChild(new JLabel("Item 2"))
+                .build();
     }
 
     /**
@@ -31,27 +35,41 @@ public class Test extends javax.swing.JFrame {
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
-        jButton1.setText("jButton1");
+        jButton1.setText("||");
+        jButton1.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        jButton1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton1ActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                .addContainerGap(339, Short.MAX_VALUE)
+            .addGroup(layout.createSequentialGroup()
+                .addContainerGap()
                 .addComponent(jButton1)
-                .addGap(309, 309, 309))
+                .addContainerGap(681, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addGap(58, 58, 58)
+                .addContainerGap()
                 .addComponent(jButton1)
-                .addContainerGap(394, Short.MAX_VALUE))
+                .addContainerGap(446, Short.MAX_VALUE))
         );
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
+
+    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+        if (drawer.isShow()) {
+            drawer.hide();
+        } else {
+            drawer.show();
+        }
+    }//GEN-LAST:event_jButton1ActionPerformed
 
     /**
      * @param args the command line arguments
