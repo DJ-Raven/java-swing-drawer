@@ -14,7 +14,7 @@ public class Test extends javax.swing.JFrame {
         initComponents();
         drawer = Drawer.newDrawer(this)
                 .background(new Color(90, 90, 90))
-                .closeOnPress(false)
+                .closeOnPress(true)
                 .drawerWidth(250)
                 .header(new JButton("Header"))
                 .addChild(new JLabel("Item 1"))
