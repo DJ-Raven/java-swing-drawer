@@ -1,10 +1,10 @@
 package test;
 
+import javaswingdev.drawer.DrawerItem;
 import java.awt.Color;
 import javaswingdev.drawer.Drawer;
 import javaswingdev.drawer.DrawerController;
-import javax.swing.JButton;
-import javax.swing.JLabel;
+import javax.swing.ImageIcon;
 
 public class Test extends javax.swing.JFrame {
 
@@ -15,10 +15,19 @@ public class Test extends javax.swing.JFrame {
         drawer = Drawer.newDrawer(this)
                 .background(new Color(90, 90, 90))
                 .closeOnPress(true)
+                .backgroundTransparent(0.3f)
+                .leftDrawer(true)
                 .drawerWidth(250)
-                .header(new JButton("Header"))
-                .addChild(new JLabel("Item 1"))
-                .addChild(new JLabel("Item 2"))
+                .headerHeight(160)
+                .header(new Header())
+                .space(3)
+                .addChild(new DrawerItem("User ").icon(new ImageIcon(getClass().getResource("/icon/user.png"))).build())
+                .addChild(new DrawerItem("Contacts").icon(new ImageIcon(getClass().getResource("/icon/cont.png"))).build())
+                .addChild(new DrawerItem("Report").icon(new ImageIcon(getClass().getResource("/icon/report.png"))).build())
+                .addChild(new DrawerItem("Income").icon(new ImageIcon(getClass().getResource("/icon/income.png"))).build())
+                .addChild(new DrawerItem("Expense").icon(new ImageIcon(getClass().getResource("/icon/expense.png"))).build())
+                .addChild(new DrawerItem("Datas").icon(new ImageIcon(getClass().getResource("/icon/data.png"))).build())
+                .addFooter(new DrawerItem("Exit").icon(new ImageIcon(getClass().getResource("/icon/exit.png"))).build())
                 .build();
     }
 
@@ -32,6 +41,8 @@ public class Test extends javax.swing.JFrame {
     private void initComponents() {
 
         jButton1 = new javax.swing.JButton();
+        jScrollPane1 = new javax.swing.JScrollPane();
+        jTable1 = new javax.swing.JTable();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -43,21 +54,84 @@ public class Test extends javax.swing.JFrame {
             }
         });
 
+        jTable1.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+                {null, null, null, null},
+                {null, null, null, null},
+                {null, null, null, null},
+                {null, null, null, null},
+                {null, null, null, null},
+                {null, null, null, null},
+                {null, null, null, null},
+                {null, null, null, null},
+                {null, null, null, null},
+                {null, null, null, null},
+                {null, null, null, null},
+                {null, null, null, null},
+                {null, null, null, null},
+                {null, null, null, null},
+                {null, null, null, null},
+                {null, null, null, null},
+                {null, null, null, null},
+                {null, null, null, null},
+                {null, null, null, null},
+                {null, null, null, null},
+                {null, null, null, null},
+                {null, null, null, null},
+                {null, null, null, null},
+                {null, null, null, null},
+                {null, null, null, null},
+                {null, null, null, null},
+                {null, null, null, null},
+                {null, null, null, null},
+                {null, null, null, null},
+                {null, null, null, null},
+                {null, null, null, null},
+                {null, null, null, null},
+                {null, null, null, null},
+                {null, null, null, null},
+                {null, null, null, null},
+                {null, null, null, null},
+                {null, null, null, null},
+                {null, null, null, null},
+                {null, null, null, null},
+                {null, null, null, null},
+                {null, null, null, null},
+                {null, null, null, null},
+                {null, null, null, null},
+                {null, null, null, null},
+                {null, null, null, null},
+                {null, null, null, null},
+                {null, null, null, null},
+                {null, null, null, null},
+                {null, null, null, null},
+                {null, null, null, null}
+            },
+            new String [] {
+                "Title 1", "Title 2", "Title 3", "Title 4"
+            }
+        ));
+        jScrollPane1.setViewportView(jTable1);
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jButton1)
-                .addContainerGap(681, Short.MAX_VALUE))
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jButton1)
+                    .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap(521, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(jButton1)
-                .addContainerGap(446, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 264, Short.MAX_VALUE)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap())
         );
 
         pack();
@@ -108,5 +182,7 @@ public class Test extends javax.swing.JFrame {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton jButton1;
+    private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JTable jTable1;
     // End of variables declaration//GEN-END:variables
 }
