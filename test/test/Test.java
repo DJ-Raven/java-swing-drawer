@@ -18,14 +18,11 @@ public class Test extends javax.swing.JFrame {
                 .closeOnPress(true)
                 .backgroundTransparent(0.3f)
                 .leftDrawer(true)
-                .drawerWidth(250)
                 .enableScroll(true)
                 .enableScrollUI(false)
                 .headerHeight(160)
-                .leftDrawer(false)
                 .header(new Header())
                 .space(3)
-                .itemAlignLeft(false)
                 .addChild(new DrawerItem("User ").icon(new ImageIcon(getClass().getResource("/icon/user.png"))).build())
                 .addChild(new DrawerItem("Contacts").icon(new ImageIcon(getClass().getResource("/icon/cont.png"))).build())
                 .addChild(new DrawerItem("Report").icon(new ImageIcon(getClass().getResource("/icon/report.png"))).build())
@@ -69,36 +66,6 @@ public class Test extends javax.swing.JFrame {
 
         jTable1.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null},
                 {null, null, null, null},
                 {null, null, null, null},
                 {null, null, null, null},
