@@ -5,6 +5,7 @@ import javaswingdev.drawer.Drawer;
 import javaswingdev.drawer.DrawerController;
 import javax.swing.JButton;
 import javax.swing.JLabel;
+import javax.swing.JSeparator;
 
 public class Test extends javax.swing.JFrame {
 
@@ -14,11 +15,16 @@ public class Test extends javax.swing.JFrame {
         initComponents();
         drawer = Drawer.newDrawer(this)
                 .background(new Color(90, 90, 90))
-                .closeOnPress(false)
+                .closeOnPress(true)
+                .backgroundTransparent(0.3f)
+                .leftDrawer(false)
                 .drawerWidth(250)
                 .header(new JButton("Header"))
+                .separator(1, new Color(194, 194, 194))
                 .addChild(new JLabel("Item 1"))
+                .space(20)
                 .addChild(new JLabel("Item 2"))
+                .addChild(new JSeparator())
                 .build();
     }
 

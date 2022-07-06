@@ -3,6 +3,7 @@ package javaswingdev.drawer;
 import java.awt.AlphaComposite;
 import java.awt.Color;
 import java.awt.Component;
+import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Rectangle;
@@ -13,6 +14,7 @@ import java.util.ArrayList;
 import java.util.List;
 import javax.swing.JComponent;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
 import net.miginfocom.swing.MigLayout;
 import org.jdesktop.animation.timing.Animator;
 import org.jdesktop.animation.timing.TimingTargetAdapter;
@@ -38,6 +40,7 @@ public class Drawer implements DrawerController {
     private int resolution = 10;
     private boolean isShow;
     private boolean closeOnPress = true;
+    private boolean leftDrawer = true;
 
     private Drawer(JFrame fram) {
         this.fram = fram;
@@ -86,6 +89,22 @@ public class Drawer implements DrawerController {
         return this;
     }
 
+    public Drawer space(int height) {
+        JLabel label = new JLabel();
+        label.setPreferredSize(new Dimension(0, height));
+        childrens.add(label);
+        return this;
+    }
+
+    public Drawer separator(int height, Color color) {
+        JLabel label = new JLabel();
+        label.setPreferredSize(new Dimension(0, height));
+        label.setBackground(color);
+        label.setOpaque(true);
+        childrens.add(label);
+        return this;
+    }
+
     public Drawer background(Color color) {
         background = color;
         return this;
@@ -123,6 +142,11 @@ public class Drawer implements DrawerController {
 
     public Drawer closeOnPress(boolean closeOnPress) {
         this.closeOnPress = closeOnPress;
+        return this;
+    }
+
+    public Drawer leftDrawer(boolean leftDrawer) {
+        this.leftDrawer = leftDrawer;
         return this;
     }
 
@@ -166,7 +190,7 @@ public class Drawer implements DrawerController {
     }
 
     public DrawerController build() {
-        panelDrawer = new DrawerPanel(drawerWidth, backgroundTransparent);
+        panelDrawer = new DrawerPanel(drawerWidth, backgroundTransparent, leftDrawer);
         panelDrawer.setBackground(background);
         panelDrawer.setDrawerBackground(drawerBackground);
         if (header != null) {
@@ -177,6 +201,7 @@ public class Drawer implements DrawerController {
         }
         createAnimator(duration, resolution);
         fram.setGlassPane(panelDrawer);
+        fram.getGlassPane().setVisible(true);
         return this;
     }
 
@@ -188,10 +213,17 @@ public class Drawer implements DrawerController {
 
         public void setAnimate(float animate) {
             this.animate = animate;
-            int w = (int) ((width * animate) - width);
-            layout.setComponentConstraints(panel, "pos " + w + " 0 n 100%");
+            if (leftDrawer) {
+                int w = (int) ((width * animate) - width);
+                layout.setComponentConstraints(panel, "pos " + w + " 0 n 100%");
+            } else {
+                int w = (int) ((width * animate));
+                layout.setComponentConstraints(panel, "pos 100%-" + w + " 0 n 100%");
+            }
             panel.revalidate();
-            repaint();
+            if (targetAlpha != 0) {
+                repaint();
+            }
         }
 
         private final MigLayout layout;
@@ -199,16 +231,22 @@ public class Drawer implements DrawerController {
         private float animate = 0f;
         private final int width;
         private final float targetAlpha;
+        private final boolean leftDrawer;
 
-        public DrawerPanel(int width, float targetAlpha) {
+        public DrawerPanel(int width, float targetAlpha, boolean leftDrawer) {
             this.width = width;
             this.targetAlpha = targetAlpha;
-            layout = new MigLayout("");
+            this.leftDrawer = leftDrawer;
+            layout = new MigLayout();
             setLayout(layout);
             panel = new DrawerItem();
             panel.setOpaque(false);
-            panel.setLayout(new MigLayout("inset 0, wrap, gap 0", " [" + width + "]", "[fill,top]"));
-            add(panel, "pos -" + width + " 0 n 100%");
+            panel.setLayout(new MigLayout("inset 0, wrap, gap 0", " [" + width + "!,fill]", "[fill,top]"));
+            if (leftDrawer) {
+                add(panel, "pos -" + width + " 0 n 100%");
+            } else {
+                add(panel, "pos 100% 0 n 100%");
+            }
         }
 
         public void addItem(Component com) {
@@ -221,11 +259,13 @@ public class Drawer implements DrawerController {
 
         @Override
         protected void paintComponent(Graphics g) {
-            Graphics2D g2 = (Graphics2D) g.create();
-            g2.setColor(getBackground());
-            g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, animate * targetAlpha));
-            g2.fill(new Rectangle(0, 0, getWidth(), getHeight()));
-            g2.dispose();
+            if (targetAlpha != 0) {
+                Graphics2D g2 = (Graphics2D) g.create();
+                g2.setColor(getBackground());
+                g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, animate * targetAlpha));
+                g2.fill(new Rectangle(0, 0, getWidth(), getHeight()));
+                g2.dispose();
+            }
             super.paintComponent(g);
         }
 
