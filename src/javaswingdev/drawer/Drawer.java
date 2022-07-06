@@ -119,6 +119,16 @@ public class Drawer implements DrawerController {
 
     public Drawer addFooter(Component... component) {
         for (Component com : component) {
+            if (com instanceof DrawerItem) {
+                DrawerItem item = (DrawerItem) com;
+                item.setIndex(index++);
+                item.addActionListener(new ActionListener() {
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
+                        runEvent(item.getIndex(), item);
+                    }
+                });
+            }
             footers.add(com);
         }
         return this;
