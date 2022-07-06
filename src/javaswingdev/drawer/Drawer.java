@@ -7,12 +7,15 @@ import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Rectangle;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.util.ArrayList;
 import java.util.List;
 import javaswingdev.drawer.scroll.ScrollBar;
+import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -33,6 +36,7 @@ public class Drawer implements DrawerController {
     private Animator animator;
     private MouseListener mouseEvent;
     private final JFrame fram;
+    private final List<EventDrawer> events;
     private final List<Component> childrens;
     private final List<Component> footers;
     private Component header;
@@ -49,11 +53,14 @@ public class Drawer implements DrawerController {
     private int itemHeight = 45;
     private boolean enableScroll = false;
     private boolean enableScrollUI = true;
+    private int index = 0;
+    private boolean itemAlignLeft = true;
 
     private Drawer(JFrame fram) {
         this.fram = fram;
         childrens = new ArrayList<>();
         footers = new ArrayList<>();
+        events = new ArrayList<>();
     }
 
     private void createAnimator(int duration, int resolution) {
@@ -95,6 +102,16 @@ public class Drawer implements DrawerController {
 
     public Drawer addChild(Component... component) {
         for (Component com : component) {
+            if (com instanceof DrawerItem) {
+                DrawerItem item = (DrawerItem) com;
+                item.setIndex(index++);
+                item.addActionListener(new ActionListener() {
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
+                        runEvent(item.getIndex(), item);
+                    }
+                });
+            }
             childrens.add(com);
         }
         return this;
@@ -183,6 +200,16 @@ public class Drawer implements DrawerController {
         return this;
     }
 
+    public Drawer itemAlignLeft(boolean itemAlignLeft) {
+        this.itemAlignLeft = itemAlignLeft;
+        return this;
+    }
+
+    public Drawer event(EventDrawer event) {
+        this.events.add(event);
+        return this;
+    }
+
     @Override
     public void show() {
         if (!isShow) {
@@ -222,6 +249,12 @@ public class Drawer implements DrawerController {
         animator.start();
     }
 
+    private void runEvent(int index, DrawerItem item) {
+        for (EventDrawer event : events) {
+            event.selected(index, item);
+        }
+    }
+
     public DrawerController build() {
         panelDrawer = new DrawerPanel(drawerWidth, backgroundTransparent, leftDrawer);
         panelDrawer.setBackground(background);
@@ -234,6 +267,7 @@ public class Drawer implements DrawerController {
             panelItem.setOpaque(false);
             for (Component com : childrens) {
                 if (com.toString().equals("drawer")) {
+                    checkAlign(com);
                     panelItem.add(com, "height " + itemHeight);
                 } else {
                     panelItem.add(com);
@@ -243,6 +277,7 @@ public class Drawer implements DrawerController {
                 panelItem.add(new JLabel(), "push");
                 for (Component com : footers) {
                     if (com.toString().equals("drawer")) {
+                        checkAlign(com);
                         panelItem.add(com, "height " + itemHeight);
                     } else {
                         panelItem.add(com);
@@ -253,6 +288,7 @@ public class Drawer implements DrawerController {
         } else {
             for (Component com : childrens) {
                 if (com.toString().equals("drawer")) {
+                    checkAlign(com);
                     panelDrawer.addItem(com, "height " + itemHeight);
                 } else {
                     panelDrawer.addItem(com);
@@ -262,6 +298,7 @@ public class Drawer implements DrawerController {
                 panelDrawer.addItem(new JLabel(), "push");
                 for (Component com : footers) {
                     if (com.toString().equals("drawer")) {
+                        checkAlign(com);
                         panelDrawer.addItem(com, "height " + itemHeight);
                     } else {
                         panelDrawer.addItem(com);
@@ -273,6 +310,14 @@ public class Drawer implements DrawerController {
         fram.setGlassPane(panelDrawer);
         fram.getGlassPane().setVisible(true);
         return this;
+    }
+
+    private void checkAlign(Component com) {
+        if (!itemAlignLeft) {
+            JButton item = (JButton) com;
+            item.setHorizontalTextPosition(JButton.LEFT);
+            item.setHorizontalAlignment(JButton.RIGHT);
+        }
     }
 
     private JScrollPane createScroll(Component com) {
@@ -313,7 +358,7 @@ public class Drawer implements DrawerController {
         }
 
         private final MigLayout layout;
-        private final DrawerItem panel;
+        private final DrawerPanelItem panel;
         private float animate = 0f;
         private final int width;
         private final float targetAlpha;
@@ -325,7 +370,7 @@ public class Drawer implements DrawerController {
             this.leftDrawer = leftDrawer;
             layout = new MigLayout();
             setLayout(layout);
-            panel = new DrawerItem();
+            panel = new DrawerPanelItem();
             panel.setOpaque(false);
             panel.setLayout(new MigLayout("inset 0, wrap, gap 0", " [" + width + "!,fill]", "[fill,top]"));
             if (leftDrawer) {
@@ -360,9 +405,9 @@ public class Drawer implements DrawerController {
         }
     }
 
-    private class DrawerItem extends JComponent {
+    private class DrawerPanelItem extends JComponent {
 
-        public DrawerItem() {
+        public DrawerPanelItem() {
             addMouseListener(new MouseAdapter() {
                 @Override
                 public void mousePressed(MouseEvent e) {
