@@ -84,8 +84,10 @@ public class Drawer implements DrawerController {
         return this;
     }
 
-    public Drawer addChild(Component component) {
-        childrens.add(component);
+    public Drawer addChild(Component... component) {
+        for (Component com : component) {
+            childrens.add(com);
+        }
         return this;
     }
 
